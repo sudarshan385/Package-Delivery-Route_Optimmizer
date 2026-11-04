@@ -22,6 +22,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -36,7 +37,9 @@ public class DriverService {
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public DriverResponse createDriver(DriverRequest request) {
-        String trimmedLicense = request.getLicenseNumber().trim();
+        String trimmedLicense = StringUtils.hasText(request.getLicenseNumber())
+                ? request.getLicenseNumber().trim()
+                : generateDefaultDriverLicense();
         if (driverRepository.existsByLicenseNumber(trimmedLicense)) {
             throw new ConflictException("Driver license number '" + trimmedLicense + "' is already in use.");
         }
@@ -165,5 +168,16 @@ public class DriverService {
 
         Driver saved = driverRepository.save(driver);
         return DriverResponse.fromEntity(saved);
+    }
+
+    public String generateDefaultDriverLicense() {
+        for (int i = 0; i < 100; i++) {
+            int randomSerial = java.util.concurrent.ThreadLocalRandom.current().nextInt(100000, 999999);
+            String candidate = "KA04-2023-" + randomSerial;
+            if (!driverRepository.existsByLicenseNumber(candidate)) {
+                return candidate;
+            }
+        }
+        return "KA04-2023-" + String.format("%06d", System.currentTimeMillis() % 1000000L);
     }
 }

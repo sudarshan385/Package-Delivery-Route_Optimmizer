@@ -126,12 +126,16 @@ public class AuthService {
             throw new ConflictException("Email '" + request.getEmail() + "' is already registered.");
         }
 
+        String driverLicense = null;
         if (request.getRole() == Role.DRIVER) {
-            if (!StringUtils.hasText(request.getLicenseNumber())) {
-                throw new com.routeoptimizer.exception.BadRequestException("License number is required for DRIVER.");
+            driverLicense = request.getLicenseNumber();
+            if (!StringUtils.hasText(driverLicense)) {
+                driverLicense = generateDefaultDriverLicense();
+            } else {
+                driverLicense = driverLicense.trim();
             }
-            if (driverRepository.findByLicenseNumber(request.getLicenseNumber().trim()).isPresent()) {
-                throw new ConflictException("Driver license number '" + request.getLicenseNumber() + "' is already in use.");
+            if (driverRepository.findByLicenseNumber(driverLicense).isPresent()) {
+                throw new ConflictException("Driver license number '" + driverLicense + "' is already in use.");
             }
         }
 
@@ -154,7 +158,7 @@ public class AuthService {
                     .user(savedUser)
                     .name(StringUtils.hasText(request.getFullName()) ? request.getFullName() : request.getUsername())
                     .phone(request.getPhone())
-                    .licenseNumber(request.getLicenseNumber().trim())
+                    .licenseNumber(driverLicense)
                     .status(DriverStatus.AVAILABLE)
                     .build();
             driver.setActive(true);
@@ -208,5 +212,16 @@ public class AuthService {
                 .email(user.getEmail())
                 .role(user.getRole() != null ? user.getRole().name() : "USER")
                 .build();
+    }
+
+    public String generateDefaultDriverLicense() {
+        for (int i = 0; i < 100; i++) {
+            int randomSerial = java.util.concurrent.ThreadLocalRandom.current().nextInt(100000, 999999);
+            String candidate = "KA04-2023-" + randomSerial;
+            if (driverRepository.findByLicenseNumber(candidate).isEmpty()) {
+                return candidate;
+            }
+        }
+        return "KA04-2023-" + String.format("%06d", System.currentTimeMillis() % 1000000L);
     }
 }

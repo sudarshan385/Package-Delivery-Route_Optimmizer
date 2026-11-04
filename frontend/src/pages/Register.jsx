@@ -25,18 +25,23 @@ export const extractErrorMessage = (err, fallback = 'Account creation failed') =
   return err.response?.data?.detail || err.response?.data?.message || err.message || fallback;
 };
 
+export const generateDefaultDriverLicense = () => {
+  const serial = Math.floor(100000 + Math.random() * 900000);
+  return `KA04-2023-${serial}`;
+};
+
 export default function Register() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({
+  const [form, setForm] = useState(() => ({
     fullName: '',
     username: '',
     email: '',
     role: 'DRIVER', // Safe default: DRIVER (ADMIN is strictly excluded)
     phone: '',
-    licenseNumber: '',
+    licenseNumber: generateDefaultDriverLicense(),
     password: '',
     confirmPassword: '',
-  });
+  }));
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -49,7 +54,13 @@ export default function Register() {
     if (name === 'role' && value === 'ADMIN') {
       return;
     }
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setForm((prev) => {
+      const next = { ...prev, [name]: value };
+      if (name === 'role' && value === 'DRIVER' && !prev.licenseNumber?.trim()) {
+        next.licenseNumber = generateDefaultDriverLicense();
+      }
+      return next;
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -81,9 +92,11 @@ export default function Register() {
       return;
     }
 
-    if (form.role === 'DRIVER' && !form.licenseNumber.trim()) {
-      setError('Driver license number is required for Driver accounts');
-      return;
+    let driverLicense = form.licenseNumber?.trim();
+    if (form.role === 'DRIVER') {
+      if (!driverLicense) {
+        driverLicense = generateDefaultDriverLicense();
+      }
     }
 
     if (form.role !== 'DRIVER' && form.role !== 'USER') {
@@ -101,7 +114,7 @@ export default function Register() {
 
     if (form.role === 'DRIVER') {
       payload.phone = form.phone.trim() || undefined;
-      payload.licenseNumber = form.licenseNumber.trim();
+      payload.licenseNumber = driverLicense;
     }
 
     setLoading(true);
@@ -207,7 +220,8 @@ export default function Register() {
                 label="Driver License #"
                 id="register-license"
                 name="licenseNumber"
-                placeholder="Official license number"
+                placeholder="e.g. KA04-2023-009988"
+                helperText="Karnataka RTO standard format (e.g. KA04-2023-009988)"
                 value={form.licenseNumber}
                 onChange={handleChange}
                 required

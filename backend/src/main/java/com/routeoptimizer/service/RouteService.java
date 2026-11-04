@@ -345,6 +345,12 @@ public class RouteService {
                     delivery.getDestinationLocation().getLatitude(), delivery.getDestinationLocation().getLongitude()
             );
 
+            if (delivery.getDestinationLocation().getId().equals(hub.getId())) {
+                throw new BadRequestException(String.format(
+                        "Delivery %d destination cannot be the origin central hub (%s) itself.",
+                        dId, hub.getName()));
+            }
+
             if (distKm > 10.0 && (delivery.getHub() == null || !hub.getId().equals(delivery.getHub().getId()))) {
                 throw new BadRequestException(String.format(
                         "Delivery %d destination (%.2f km) exceeds 10 km radius from central hub %s",

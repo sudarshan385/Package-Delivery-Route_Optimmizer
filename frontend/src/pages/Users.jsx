@@ -207,9 +207,9 @@ export default function Users() {
       setCreateError('Password must be at least 8 characters.');
       return;
     }
-    if (form.role === 'DRIVER' && (!form.licenseNumber || !form.licenseNumber.trim())) {
-      setCreateError('Driver license number is required for Driver accounts.');
-      return;
+    let driverLicense = form.licenseNumber?.trim();
+    if (form.role === 'DRIVER' && !driverLicense) {
+      driverLicense = `KA04-2023-${Math.floor(100000 + Math.random() * 900000)}`;
     }
 
     const payload = {
@@ -222,7 +222,7 @@ export default function Users() {
 
     if (form.role === 'DRIVER') {
       payload.phone = form.phone?.trim() || null;
-      payload.licenseNumber = form.licenseNumber.trim();
+      payload.licenseNumber = driverLicense;
     }
 
     // Role-specific confirmation for ADMIN creation
@@ -714,7 +714,16 @@ export default function Users() {
             label="System Role"
             id="user-role"
             value={form.role}
-            onChange={(e) => setForm({ ...form, role: e.target.value })}
+            onChange={(e) => {
+              const newRole = e.target.value;
+              setForm((prev) => ({
+                ...prev,
+                role: newRole,
+                licenseNumber: (newRole === 'DRIVER' && !prev.licenseNumber?.trim())
+                  ? `KA04-2023-${Math.floor(100000 + Math.random() * 900000)}`
+                  : prev.licenseNumber
+              }));
+            }}
             required
           >
             <option value="USER">USER</option>
@@ -740,6 +749,8 @@ export default function Users() {
               <Input
                 label="License Number"
                 id="driver-user-license"
+                placeholder="e.g. KA04-2023-009988"
+                helperText="Karnataka RTO standard format (e.g. KA04-2023-009988)"
                 value={form.licenseNumber}
                 onChange={(e) => setForm({ ...form, licenseNumber: e.target.value })}
                 required
