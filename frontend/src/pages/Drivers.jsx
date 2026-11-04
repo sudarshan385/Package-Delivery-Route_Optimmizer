@@ -14,6 +14,11 @@ import EmptyState from '../components/ui/EmptyState';
 import LoadingState from '../components/ui/LoadingState';
 import ErrorState, { parseApiError } from '../components/ui/ErrorState';
 
+export const generateDefaultDriverLicense = () => {
+  const serial = Math.floor(100000 + Math.random() * 900000);
+  return `KA04-2023-${serial}`;
+};
+
 export default function Drivers() {
   const [drivers, setDrivers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -27,7 +32,7 @@ export default function Drivers() {
   const [form, setForm] = useState({
     name: '',
     phone: '',
-    licenseNumber: '',
+    licenseNumber: generateDefaultDriverLicense(),
     status: 'AVAILABLE',
   });
 
@@ -45,7 +50,7 @@ export default function Drivers() {
   }, []);
 
   const openCreate = () => {
-    setForm({ name: '', phone: '', licenseNumber: '', status: 'AVAILABLE' });
+    setForm({ name: '', phone: '', licenseNumber: generateDefaultDriverLicense(), status: 'AVAILABLE' });
     setEditing(null);
     setError('');
     setShowModal(true);
@@ -68,15 +73,14 @@ export default function Drivers() {
     setError('');
 
     const trimmedName = form.name.trim();
-    const trimmedLicense = form.licenseNumber.trim();
+    let trimmedLicense = form.licenseNumber?.trim();
 
     if (!trimmedName) {
       setError('Driver name is required.');
       return;
     }
     if (!trimmedLicense) {
-      setError('License number is required.');
-      return;
+      trimmedLicense = generateDefaultDriverLicense();
     }
 
     if (editing && (editing.status === 'ON_DELIVERY' || editing.inActiveDelivery) && form.status !== 'ON_DELIVERY') {
@@ -238,6 +242,8 @@ export default function Drivers() {
             <Input
               label="License Number"
               id="driver-license"
+              placeholder="e.g. KA04-2023-009988"
+              helperText="Karnataka RTO standard format (e.g. KA04-2023-009988)"
               value={form.licenseNumber}
               onChange={(e) => setForm({ ...form, licenseNumber: e.target.value })}
               required

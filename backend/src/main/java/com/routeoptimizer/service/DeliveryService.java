@@ -647,14 +647,16 @@ public class DeliveryService {
             }
 
             // Radius eligibility: destination within configured 10.0 km radius from selected hub
+            // and destination must be distinct from the central hub origin
             final double maxRadiusKm = 10.0;
             eligibleList = unassignedCandidates.stream()
+                    .filter(d -> !d.getDestinationLocation().getId().equals(hub.getId()))
                     .filter(d -> {
                         double distKm = RoutingService.calculateHaversineKm(
                                 hubLat, hubLon,
                                 d.getDestinationLocation().getLatitude(), d.getDestinationLocation().getLongitude()
                         );
-                        return distKm <= maxRadiusKm;
+                        return distKm > 0.05 && distKm <= maxRadiusKm;
                     })
                     .sorted(java.util.Comparator.comparing(Delivery::getId))
                     .toList();

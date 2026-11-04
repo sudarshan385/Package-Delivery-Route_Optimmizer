@@ -4,32 +4,33 @@
 # Profile: dev (Target DB: packagedeliveryrouteoptimizer)
 # ==============================================================================
 
-# 1. Java 21 Runtime Environment Detection & Selection
-Write-Host "Verifying Java 21 runtime..."
+# 1. Java 21+ Runtime Environment Detection & Selection
+Write-Host "Verifying Java runtime..."
 $javaExe = $null
 
 if ($env:JAVA_HOME -and (Test-Path (Join-Path $env:JAVA_HOME "bin\java.exe"))) {
     $candidate = Join-Path $env:JAVA_HOME "bin\java.exe"
     $output = cmd /c """$candidate"" -version 2>&1"
-    if ($output -match '"21\.') {
+    if ($output -match '"(21|22|23|24|25)\.') {
         $javaExe = $candidate
     }
 }
 
 if (-not $javaExe) {
-    # Check standard JDK 21 installation locations
-    $knownJdk21Paths = @(
+    # Check standard JDK installation locations
+    $knownJdkPaths = @(
+        "C:\Program Files\Java\jdk-24*",
         "C:\Program Files\Java\jdk-21.0.12.1",
         "C:\Program Files\Java\jdk-21*",
         "C:\Program Files\Eclipse Adoptium\jdk-21*",
         "C:\Program Files\BellSoft\LibericaJDK-21*"
     )
-    foreach ($pattern in $knownJdk21Paths) {
+    foreach ($pattern in $knownJdkPaths) {
         $found = Get-Item $pattern -ErrorAction SilentlyContinue | Select-Object -First 1
         if ($found -and (Test-Path (Join-Path $found.FullName "bin\java.exe"))) {
             $candidate = Join-Path $found.FullName "bin\java.exe"
             $testOutput = cmd /c """$candidate"" -version 2>&1"
-            if ($testOutput -match '"21\.') {
+            if ($testOutput -match '"(21|22|23|24|25)\.') {
                 $env:JAVA_HOME = $found.FullName
                 $javaExe = $candidate
                 break
@@ -43,20 +44,20 @@ if (-not $javaExe) {
     $sysJava = Get-Command java -ErrorAction SilentlyContinue
     if ($sysJava) {
         $testOutput = cmd /c "java -version 2>&1"
-        if ($testOutput -match '"21\.') {
+        if ($testOutput -match '"(21|22|23|24|25)\.') {
             $javaExe = $sysJava.Source
         }
     }
 }
 
 if (-not $javaExe) {
-    Write-Error "[FATAL] Java 21 is required to start RouteOptimizer backend, but no Java 21 installation was found. Please set JAVA_HOME to JDK 21."
+    Write-Error "[FATAL] Java 21+ is required to start RouteOptimizer backend, but no compatible Java installation was found. Please set JAVA_HOME."
     exit 1
 }
 
 # Prepend JAVA_HOME\bin to PATH for this process session
 $env:PATH = "$env:JAVA_HOME\bin;$env:PATH"
-Write-Host "[OK] Java 21 configured: $env:JAVA_HOME"
+Write-Host "[OK] Java runtime configured: $env:JAVA_HOME"
 
 # Ensure Maven is available on PATH
 if (-not (Get-Command mvn -ErrorAction SilentlyContinue)) {
@@ -67,6 +68,7 @@ if (-not (Get-Command mvn -ErrorAction SilentlyContinue)) {
 }
 if (-not (Get-Command mvn -ErrorAction SilentlyContinue)) {
     $knownMavenPaths = @(
+        "$env:USERPROFILE\.m2\wrapper\dists\apache-maven-*\*\bin",
         "$env:USERPROFILE\Downloads\apache-maven-*\bin",
         "C:\Program Files\apache-maven-*\bin",
         "C:\apache-maven-*\bin"
@@ -91,10 +93,10 @@ if (-not $env:DEV_DB_URL) {
     $env:DEV_DB_URL = "jdbc:postgresql://localhost:5432/packagedeliveryrouteoptimizer"
 }
 if (-not $env:DEV_DB_USERNAME) {
-    $env:DEV_DB_USERNAME = "app_user"
+    $env:DEV_DB_USERNAME = "postgresql"
 }
 if (-not $env:DEV_DB_PASSWORD) {
-    $env:DEV_DB_PASSWORD = "app_password"
+    $env:DEV_DB_PASSWORD = "root"
 }
 if (-not $env:JWT_SECRET) {
     $env:JWT_SECRET = "dev-suite-dedicated-hmac-sha256-signing-key-min-32-bytes"
@@ -119,6 +121,7 @@ if ($secretTrimmed -ieq $forbiddenHex -or $placeholders -contains $secretTrimmed
 
 # 3. Pre-flight PostgreSQL Connectivity & Credential Verification
 $psqlPaths = @(
+    "c:\Users\bp648\pgsql\bin\psql.exe",
     "C:\Program Files\PostgreSQL\18\bin\psql.exe",
     "C:\Program Files\PostgreSQL\17\bin\psql.exe",
     "C:\Program Files\PostgreSQL\16\bin\psql.exe"
