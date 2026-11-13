@@ -16,6 +16,27 @@
     <version>1.0.0</version>
     <name>Package Delivery Route Optimizer</name>
     <description>Package Delivery Route Optimizer</description>
+    <url>https://github.com/sudarshan385/Package-Delivery-Route_Optimmizer</url>
+
+    <developers>
+        <developer>
+            <id>sudarshan385</id>
+            <name>Sudarshan Singe</name>
+            <email>sudarshansinge0083@gmail.com</email>
+            <url>https://github.com/sudarshan385</url>
+            <roles>
+                <role>Project Owner</role>
+                <role>Lead Developer</role>
+            </roles>
+            <timezone>+5:30</timezone>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/sudarshan385/Package-Delivery-Route_Optimmizer.git</connection>
+        <developerConnection>scm:git:ssh://github.com:sudarshan385/Package-Delivery-Route_Optimmizer.git</developerConnection>
+        <url>https://github.com/sudarshan385/Package-Delivery-Route_Optimmizer</url>
+    </scm>
 
     <properties>
         <java.version>21</java.version>

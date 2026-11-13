@@ -3,6 +3,10 @@ info:
   title: Package Delivery Route Optimizer API
   description: Authoritative REST API specification for the Package Delivery Route Optimizer system.
   version: 1.0.0
+  contact:
+    name: Sudarshan Singe
+    email: sudarshansinge0083@gmail.com
+    url: https://github.com/sudarshan385/Package-Delivery-Route_Optimmizer
 servers:
   - url: http://localhost:8080
     description: Local Spring Boot Backend Server
