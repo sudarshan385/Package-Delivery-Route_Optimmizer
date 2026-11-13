@@ -3,6 +3,11 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "author": "Sudarshan Singe <sudarshansinge0083@gmail.com> (https://github.com/sudarshan385)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sudarshan385/Package-Delivery-Route_Optimmizer.git"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",

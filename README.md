@@ -4,6 +4,16 @@ A production-grade, full-stack enterprise route optimization and package deliver
 
 ---
 
+## Project Ownership & Authorship
+
+- **Project Owner & Developer**: Sudarshan Singe ([@sudarshan385](https://github.com/sudarshan385))
+- **Email**: [sudarshansinge0083@gmail.com](mailto:sudarshansinge0083@gmail.com)
+- **Official Repository**: [https://github.com/sudarshan385/Package-Delivery-Route_Optimmizer](https://github.com/sudarshan385/Package-Delivery-Route_Optimmizer)
+- **Project Type**: Individual Academic Final-Year Major Project
+- **Ownership Notice**: This is an individual academic project owned and maintained by Sudarshan Singe. The repository's historical Git commit metadata is preserved separately from project ownership.
+
+---
+
 ## 1. Project Purpose
 
 The Package Delivery Route Optimizer is designed to solve last-mile delivery logistical challenges by pairing graph-based shortest path route optimization with end-to-end package delivery lifecycle management. The system guarantees atomic state synchronization across packages, deliveries, drivers, and vehicles, enforces strict role-based access control, provides real-time operational analytics, and generates authoritative audit reports.
@@ -286,6 +296,7 @@ The current production release focuses strictly on deterministic, graph-based ro
 
 ---
 
-## 15. License
+## 15. License & Ownership Notice
 
-Academic Final-Year Major Project — All rights reserved.
+Academic Final-Year Major Project — All rights reserved.  
+Individually authored, designed, and maintained by **Sudarshan Singe** ([@sudarshan385](https://github.com/sudarshan385)).
